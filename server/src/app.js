@@ -13,13 +13,39 @@ const notFound = require("./middleware/notFound.middleware");
 
 const app = express();
 
+const rawOrigins = [
+  "http://localhost:5173",
+  "http://localhost:5174",
+  process.env.CLIENT_URL || "",
+].filter(Boolean);
+
+// normalize: remove trailing slashes
+const allowedOrigins = rawOrigins.map((o) => o.replace(/\/+$/, ""));
+
 // Global Middleware
 app.use(
   cors({
-    origin: process.env.CLIENT_URL || "http://localhost:5173",
+    origin: (incomingOrigin, callback) => {
+      if (!incomingOrigin) return callback(null, true);
+
+      const clean = incomingOrigin.replace(/\/+$/, "");
+
+      if (allowedOrigins.includes(clean)) {
+        return callback(null, true);
+      }
+
+      console.warn(`[CORS] Blocked origin: ${incomingOrigin}`);
+      return callback(new Error(`CORS origin "${incomingOrigin}" not allowed`));
+    },
     credentials: true,
+    methods: ["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],
+    allowedHeaders: ["Content-Type", "Authorization"],
   }),
 );
+
+// handle pre-flight options req from all user
+app.options("*", cors());
+
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
@@ -30,7 +56,7 @@ if (process.env.NODE_ENV === "development") {
 
 // Health Check
 app.get("/api/health", (_req, res) => {
-  res.json({ status: "ok", message: "PrepSignal API is running 🚀" });
+  res.json({ status: "ok", message: "PrepSignal API is running " });
 });
 
 //Routes
