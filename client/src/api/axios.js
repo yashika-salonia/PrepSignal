@@ -1,5 +1,4 @@
 // Axios instance shared across the whole app
-// Automatically attaches JWT from localStorage to every request.
 
 import axios from "axios";
 
@@ -22,12 +21,22 @@ api.interceptors.request.use(
 api.interceptors.response.use(
   (response) => response,
   (error) => {
-    if (error.response?.status === 401) {
-      // Token expired or invalid — clear local storage and redirect to login
+    const status = error.response?.status;
+    const url = error.config?.url || "";
+
+    // Auth endpoints (login/register) should NEVER trigger a redirect —
+    // let the page component handle and display the error itself.
+    const isAuthEndpoint =
+      url.includes("/auth/login") || url.includes("/auth/register");
+
+    if (status === 401 && !isAuthEndpoint) {
+      // Token expired or invalid on a protected route → clear and redirect
       localStorage.removeItem("prepsignal_token");
       localStorage.removeItem("prepsignal_user");
       window.location.href = "/login";
     }
+
+    // Always reject so the calling component can catch and show the error
     return Promise.reject(error);
   },
 );
