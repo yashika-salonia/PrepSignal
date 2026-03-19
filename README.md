@@ -261,6 +261,29 @@ React Component
 
 ---
 
+## 🤝 Contributing
+
+```bash
+# Fork → clone → create branch
+git checkout -b feat/your-feature-name
+
+# Make changes, then commit
+git commit -m "feat: describe what you added"
+
+# Push and open a Pull Request
+git push origin feat/your-feature-name
+```
+
+Please keep controllers thin — all logic belongs in the service layer.
+
+---
+
+## 📄 License
+
+MIT © Yashika Salonia (https://github.com/yashika-salonia)
+
+---
+
 <div align="center">
  
 Built with ☕ and late nights for every student fighting their placement war.
