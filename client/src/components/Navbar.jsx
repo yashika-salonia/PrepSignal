@@ -23,14 +23,13 @@ export default function Navbar() {
     <header className="sticky top-0 z-50 border-b border-slate-800/60 bg-slate-950/80 backdrop-blur-md">
       <div className="max-w-6xl mx-auto px-4 h-16 flex items-center justify-between">
         {/* Logo */}
-        <Link to="/" className="flex items-center gap-2.5 group">
-          <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-signal-500 to-signal-600 flex items-center justify-center shadow-lg shadow-signal-500/30 group-hover:shadow-signal-500/50 transition-shadow">
-            <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
-              <path d="M8 2L14 12H2L8 2Z" fill="white" fillOpacity="0.9" />
-              <circle cx="8" cy="9" r="2" fill="white" />
-            </svg>
-          </div>
-          <span className="font-display font-700 text-white text-lg tracking-tight">
+        <Link to="/" className="flex items-center gap-2 group">
+          <img
+            src="/logo.png"
+            alt="PrepSignal Logo"
+            className="w-10 h-10 rounded-xl object-contain group-hover:scale-105 transition-transform duration-200"
+          />
+          <span className="font-display font-900 text-white text-2xl tracking-tight">
             Prep<span className="text-signal-400">Signal</span>
           </span>
         </Link>
