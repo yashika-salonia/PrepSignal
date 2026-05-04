@@ -29,4 +29,13 @@ const getUserAttempts = async (userId, filters = {}) => {
   return attempts;
 };
 
-module.exports = { createAttempt, getUserAttempts };
+const deleteAttempt = async (userId, attemptId) => {
+  const deleted = await Attempt.findOneAndDelete({
+    _id: attemptId,
+    user: userId,
+  });
+
+  return deleted;
+};
+
+module.exports = { createAttempt, getUserAttempts, deleteAttempt };

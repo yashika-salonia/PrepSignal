@@ -5,6 +5,7 @@ const router = express.Router();
 const {
   logAttempt,
   getAttempts,
+  deleteAttempt,
   attemptValidation,
 } = require("../controllers/attempt.controller");
 const { protect } = require("../middleware/auth.middleware");
@@ -14,5 +15,6 @@ router.use(protect);
 
 router.post("/", attemptValidation, logAttempt);
 router.get("/", getAttempts);
+router.delete("/:id", deleteAttempt);
 
 module.exports = router;

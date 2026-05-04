@@ -5,7 +5,7 @@ const attemptService = require("../services/attempt.service");
 const { sendSuccess, sendError } = require("../utils/apiResponse.utils");
 const { TOPICS } = require("../models/Problem.model");
 
-// Validation Rules 
+// Validation Rules
 const attemptValidation = [
   body("problemTitle")
     .trim()
@@ -24,7 +24,7 @@ const attemptValidation = [
     .withMessage("Confidence must be between 1 and 5"),
 ];
 
-// Handler: POST /api/attempts 
+// Handler: POST /api/attempts
 const logAttempt = async (req, res, next) => {
   try {
     const errors = validationResult(req);
@@ -39,7 +39,7 @@ const logAttempt = async (req, res, next) => {
   }
 };
 
-// Handler: GET /api/attempts 
+// Handler: GET /api/attempts
 const getAttempts = async (req, res, next) => {
   try {
     const attempts = await attemptService.getUserAttempts(
@@ -52,4 +52,27 @@ const getAttempts = async (req, res, next) => {
   }
 };
 
-module.exports = { logAttempt, getAttempts, attemptValidation };
+// Handler: DELETE /api/attempts/:id
+const deleteAttempt = async (req, res, next) => {
+  try {
+    const attempt = await attemptService.deleteAttempt(
+      req.user._id,
+      req.params.id,
+    );
+
+    if (!attempt) {
+      return sendError(res, 404, "Attempt not found");
+    }
+
+    sendSuccess(res, 200, "Attempt deleted successfully", attempt);
+  } catch (error) {
+    next(error);
+  }
+};
+
+module.exports = {
+  logAttempt,
+  getAttempts,
+  deleteAttempt,
+  attemptValidation,
+};

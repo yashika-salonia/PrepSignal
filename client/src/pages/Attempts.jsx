@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { Link } from "react-router-dom";
+import { deleteAttempt } from "../api/attempts.api";
 import { useAttempts } from "../hooks/useAttempts";
 
 const DIFFICULTIES = ["", "Easy", "Medium", "Hard"];
@@ -13,12 +14,36 @@ const diffColor = {
 
 export default function Attempts() {
   const [filters, setFilters] = useState({ difficulty: "", solved: "" });
-  const { attempts, loading, error } = useAttempts(
+  const [deletingAttemptId, setDeletingAttemptId] = useState(null);
+  const [deleteError, setDeleteError] = useState(null);
+
+  const { attempts, loading, error, refetch } = useAttempts(
     Object.fromEntries(Object.entries(filters).filter(([, v]) => v !== "")),
   );
 
   const setFilter = (key, val) =>
     setFilters((prev) => ({ ...prev, [key]: val }));
+
+  const handleDelete = async (id) => {
+    const confirmed = window.confirm(
+      "Are you sure you want to delete this attempt?",
+    );
+    if (!confirmed) return;
+
+    setDeleteError(null);
+    setDeletingAttemptId(id);
+
+    try {
+      await deleteAttempt(id);
+      await refetch();
+    } catch (err) {
+      setDeleteError(
+        err.response?.data?.message || "Failed to delete attempt.",
+      );
+    } finally {
+      setDeletingAttemptId(null);
+    }
+  };
 
   const confidenceDots = (n) =>
     [1, 2, 3, 4, 5].map((i) => (
@@ -97,6 +122,12 @@ export default function Attempts() {
         </div>
       )}
 
+      {deleteError && (
+        <div className="glass-card p-6 text-center text-red-400 text-sm">
+          {deleteError}
+        </div>
+      )}
+
       {!loading && !error && attempts.length === 0 && (
         <div className="glass-card p-12 text-center">
           <p className="text-slate-400 font-body mb-4">No attempts found.</p>
@@ -135,6 +166,9 @@ export default function Attempts() {
                   </th>
                   <th className="text-right px-5 py-3 text-xs font-mono text-slate-500 uppercase tracking-wider">
                     Date
+                  </th>
+                  <th className="text-center px-5 py-3 text-xs font-mono text-slate-500 uppercase tracking-wider">
+                    Action
                   </th>
                 </tr>
               </thead>
@@ -194,6 +228,16 @@ export default function Attempts() {
                         day: "2-digit",
                         month: "short",
                       })}
+                    </td>
+                    <td className="px-4 py-3 text-center">
+                      <button
+                        type="button"
+                        disabled={deletingAttemptId === a._id}
+                        onClick={() => handleDelete(a._id)}
+                        className="inline-flex items-center justify-center rounded-md border border-slate-700 px-3 py-1 text-xs font-medium text-white bg-slate-800 hover:bg-slate-700 disabled:cursor-not-allowed disabled:opacity-50"
+                      >
+                        {deletingAttemptId === a._id ? "Deleting..." : "Delete"}
+                      </button>
                     </td>
                   </tr>
                 ))}
